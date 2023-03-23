@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://libs.baidu.com/jquery/2.0.0/jquery.js"></script>
+    <script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+</head>
+
+<body>
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <input id="cc" list="cookies" placeholder="请选择或输入" ng-model="currentData" />
+        <datalist id="cookies">
+            <option ng-repeat="x in names">{{x}}</option>
+        </datalist>
+        <button ng-click="sub()">确认</button>       
+    </div>
+    
+        
+    </select>
+
+    <script defer>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope) {
+            $scope.names = ["小明", "黎打", "胡旭", '齿轮发生错误', "小红", 'sad', 'asdsa',];
+            // $scope.sub = function () {
+            //     if ($scope.names.indexOf($scope.currentData) !== -1) {
+            //         alert($scope.currentData)
+            //     } else {
+            //         alert('该字段不存在，请重新选择！')
+            //         $scope.currentData = ''
+            //     }
+
+            // }
+            $('#cc').change(() => {
+                if ($scope.names.indexOf($scope.currentData) !== -1) {
+                    // alert($scope.currentData)
+                } else {
+                    alert('该字段不存在，请重新选择！')
+                    $("#cc").val() = ''
+                }
+            })
+        })
+        // $('#cc').change(()=>{
+        //             var ff = $("#cc").val();
+        //             alert(ff)})
+    </script>
+
+</body>
+
+</html>

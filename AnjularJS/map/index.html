@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://libs.baidu.com/jquery/2.0.0/jquery.js"></script>
+    <script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .active {
+            background-color: cornflowerblue;
+        }
+
+        .app {
+            width: 50%;
+            border: 1px solid gray;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            height: 60%;
+
+        }
+
+        .container {
+            height: 80%;
+        }
+
+        .col-md-2 {
+            margin: auto;
+            padding: 5%;
+        }
+
+
+        ul {
+            list-style: none;
+            border: 1px solid gray;
+            background-color: #F8F8FF;
+            min-height: 60%;
+            max-height: 60%;
+            overflow: auto;
+            padding: 0px;
+            border-radius: 5px;
+            width: auto;
+        }
+
+        li {
+            cursor: pointer;
+        }
+
+
+        .handler {
+            text-align: center;
+            display: inline-block
+        }
+
+        .btn {
+            background-color: dodgerblue;
+            color: white;
+            margin: 10px;
+        }
+
+        .btn-default {
+            color: white;
+            background-color: #C0C0C0;
+        }
+
+        .res {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <button class="btn" ng-click="showMap()">映射</button>
+        <div class="app" ng-show="showMapping">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="title">数据源字段</p>
+                        <ul class="aaaaa">
+                            <li ng-repeat="(index,item) in sourceList" ng-class="sourceflag == index ? 'active' : ''"
+                                ng-click="chooseSource(index)">{{item.value}}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="title">目标</p>
+                        <ul>
+                            <li ng-repeat="(index,item) in targetList" ng-class="targetflag == index ? 'active' : ''"
+                                ng-click="chooseTarget(index)">{{
+                                item.value
+                                }}</li>
+                        </ul>
+
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn" ng-click="addMapping()">>></button><!-- 添加 -->
+                        <button class="btn" ng-click="delMapping()">
+                            << </button><!-- 删除 -->
+                    </div>
+                    <div class="col-md-4">
+                        <p class="title">映射结果</p>
+                        <ul>
+                            <li ng-repeat="(index,item) in resultList" ng-class="resultflag == index ? 'active' : ''"
+                                ng-click="chooseResult(index)">{{
+                                item.source }}>>{{item.target }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="res">
+                <div class="handler">
+                    <button class="btn btn-default" ng-click="cancel()">取消</button>
+                </div>
+                <div class="handler">
+                    <button class="btn" ng-click="save()">保存</button>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+    <script defer>
+        const app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope) {
+            $scope.sourceList = [{ 'id': 121223, 'value': 'sr1' },
+            { 'id': 125623, 'value': 'sr2' },
+            { 'id': 134353, 'value': 'sr3' },
+            { 'id': 187563, 'value': 'sr4' },
+            { 'id': 174353, 'value': 'sr5' },
+            { 'id': 134453, 'value': 'sr6' },
+            { 'id': 134453, 'value': 'sr7' },
+            { 'id': 134453, 'value': 'sr8' },
+            { 'id': 134453, 'value': 'sr9' },
+            { 'id': 134453, 'value': 'sr10' },
+            { 'id': 134453, 'value': 'sr11' },
+            { 'id': 134453, 'value': 'sr12' },
+            { 'id': 134453, 'value': 'sr13' },
+            { 'id': 134453, 'value': 'sr14' },
+            { 'id': 194453, 'value': 'sr15' },];// 源字段列表
+            $scope.sourceflag = -1;// 样式控制
+            $scope.sourceTxt = ""; //选中的源字段
+            $scope.targetList = [{ 'id': 121223, 'value': 'SR1' },
+            { 'id': 125623, 'value': 'SR2' },
+            { 'id': 134353, 'value': 'SR3' },
+            { 'id': 134353, 'value': 'SR4' },
+            { 'id': 134353, 'value': 'SR5' },
+            { 'id': 187563, 'value': 'SR6' }]; // 目标字段列表
+            $scope.targetflag = -1; // 样式控制
+            $scope.targetTxt = ""; //选中的目标字段
+            $scope.resultList = []; // 映射结果列表
+            $scope.resultflag = -1; // 样式控制
+            $scope.resultTxt = {}; //选中的结果字段
+
+            $scope.showMapping = false
+
+
+            $scope.chooseSource = function (index) {
+                if ($scope.sourceflag === index) {
+                    $scope.sourceflag = -1
+                    $scope.sourceTxt = ''
+                } else {
+                    $scope.sourceflag = index;
+                    $scope.sourceTxt = $scope.sourceList[index].value; 
+                }
+            };
+            $scope.chooseTarget = function (index) {
+                if ($scope.targetflag === index) {
+                    $scope.targetflag = -1
+                    $scope.targetTxt = ''
+                } else {
+                    $scope.targetflag = index; 
+                    $scope.targetTxt = this.targetList[index].value; 
+                }
+            };
+            $scope.chooseResult = function (index) {
+                if ($scope.resultflag === index) {
+                    $scope.resultflag = -1
+                    $scope.resultTxt = {}
+                } else {
+                    $scope.resultflag = index; 
+                    $scope.resultTxt = $scope.resultList[index]; 
+                }
+            };
+            $scope.addMapping = function () {
+                if ($scope.sourceTxt == "" || $scope.targetTxt == "") {
+                    alert('请先选择源字段和目标字段')
+                    //$scope.$message.error("请先选择源字段和目标字段");
+                } else {
+                    //let resultTxt = this.sourceTxt + "  :  " + this.targetTxt;
+                    $scope.resultList.push({ source: $scope.sourceTxt, target: $scope.targetTxt });
+                    // 删除源列表目标列表选中的字段
+                    $scope.sourceList.splice($scope.sourceflag, 1);
+                    $scope.targetList.splice($scope.targetflag, 1);
+                    // 源列表目标列表样式置空
+                    $scope.sourceflag = -1;
+                    $scope.targetflag = -1;
+                    // 清空拼接的字符串
+                    $scope.sourceTxt = "";
+                    $scope.targetTxt = "";
+                }
+            };
+            $scope.delMapping = function () {
+                if ($scope.resultflag == -1) {
+                    //this.$message.error("请先选择映射结果");
+                    alert("请先选择映射结果")
+                } else {
+                    $scope.sourceList.push({ value: $scope.resultTxt.source });
+                    $scope.targetList.push({ value: $scope.resultTxt.target });
+                    $scope.resultList.splice($scope.resultflag, 1);
+                    $scope.resultflag = -1;
+                }
+            };
+            $scope.save = function () {
+                console.log('结果:', $scope.resultList);
+            };
+            $scope.cancel = function () {
+                $scope.resultList = [];
+                $scope.sourceTxt = "";
+                $scope.targetTxt = "";
+                $scope.resultTxt = '';
+                $scope.sourceflag = $scope.targetflag = $scope.resultflag = -1
+                $scope.sourceList = [{ 'id': 121223, 'value': 'sr1' },
+                { 'id': 125623, 'value': 'sr2' },
+                { 'id': 134353, 'value': 'sr3' },
+                { 'id': 187563, 'value': 'sr4' },
+                { 'id': 174353, 'value': 'sr5' },
+                { 'id': 134453, 'value': 'sr6' },
+                { 'id': 134453, 'value': 'sr7' },
+                { 'id': 134453, 'value': 'sr8' },
+                { 'id': 134453, 'value': 'sr9' },
+                { 'id': 134453, 'value': 'sr10' },
+                { 'id': 134453, 'value': 'sr11' },
+                { 'id': 134453, 'value': 'sr12' },
+                { 'id': 194453, 'value': 'sr13' },];
+                $scope.targetList = [{ 'id': 121223, 'value': 'SR1' },
+                { 'id': 125623, 'value': 'SR2' },
+                { 'id': 134353, 'value': 'SR3' },
+                { 'id': 134353, 'value': 'SR4' },
+                { 'id': 134353, 'value': 'SR5' },
+                { 'id': 187563, 'value': 'SR6' }];
+                $scope.showMap();
+
+            }
+
+            $scope.showMap = function () {
+                $scope.showMapping = !$scope.showMapping
+            }
+        })
+    </script>
+</body>
+
+</html>
